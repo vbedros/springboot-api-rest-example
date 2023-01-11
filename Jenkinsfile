@@ -16,16 +16,37 @@ pipeline {
     }
     stage('Test'){
           steps{
-              echo 'Test'
-              sh "pwd\n\
-              cd api\n\
-              mvn test"
-              }        
+            script{
+                echo 'Test'
+                sh "pwd\n\
+                cd api\n\
+                mvn test"
+                }
+             }        
     }
-    stage('Deploy'){
+    stage('Static code analysis'){
         steps{
-            echo 'Deploy'
+        script{
+            echo 'Static code analysis'
+            sh "cd api\n\
+              echo \"static code analysis finished\"\n\
+              mvn -X clean pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle \n\
+              echo \"static code analysis finished\""
+            }
+            
+            echo "Reading static analysis report"
+            recordIssues enabledForFailure: true, failOnError: false, tool:checkStyle(pattern: "**/target/checkstyle-result.xml")
+            recordIssues enabledForFailure: true, failOnError: false, tool:findBugs(pattern: "**/target/findbugs*.xml")
+            recordIssues enabledForFailure: true, failOnError: false, tool:cpd(pattern: "**/target/cpd.xml")
+            recordIssues enabledForFailure: true, failOnError: false, tool:pmdParser(pattern: "**/target/pmd.xml")
             }
           }        
     }
   }
+// def runStaticCodeAnalysis(){
+//   withMaven(maven: "maven-387", publisherStrategy: 'EXPLICIT'){
+//   sh "cd api\n\
+//   echo \"static code analysis finished\"\n\
+//   mvn -X clean checkstyle:checkstyle\n\
+//   echo \"static code analysis finished\""}
+// }
