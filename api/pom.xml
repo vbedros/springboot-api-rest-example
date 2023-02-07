@@ -277,7 +277,23 @@
       <properties>
         <maven.test.skip>false</maven.test.skip>
       </properties>
-      <dependencies></dependencies>
+      <dependencies>
+<!--        <dependency>-->
+<!--          <groupId>com.github.spotbugs</groupId>-->
+<!--          <artifactId>spotbugs</artifactId>-->
+<!--          <version>4.7.3</version>-->
+<!--          <type>pom</type>-->
+<!--        </dependency>-->
+      </dependencies>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.0</version>
+          </plugin>
+        </plugins>
+      </reporting>
       <build>
         <plugins>
           <plugin>
@@ -293,7 +309,6 @@
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>0.8.8</version>
-
           </plugin>
         </plugins>
       </build>
@@ -309,18 +324,20 @@
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>3.2.0</version>
         </dependency>
-        <dependency>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-          <version>3.0.2</version>
-        </dependency>
       </dependencies>
       <reporting>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>findbugs-maven-plugin</artifactId>
-            <version>3.0.2</version>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.0</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>spotbugs</report>
+                </reports>
+              </reportSet>
+            </reportSets>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -354,6 +371,36 @@
       </reporting>
       <build>
         <plugins>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.0</version>
+            <dependencies>
+              <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs</artifactId>
+                <version>4.7.3</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <spotbugsXmlOutput>true</spotbugsXmlOutput>
+              <failOnError>false</failOnError>
+              <spotbugsXmlOutputDirectory>target</spotbugsXmlOutputDirectory>
+              <skipEmptyReport>false</skipEmptyReport>
+              <includeTests>true</includeTests>
+              <effort>Max</effort>
+              <threshold>Low</threshold>
+            </configuration>
+            <executions>
+              <execution>
+                <id>spotbugs</id>
+                <goals>
+                  <goal>spotbugs</goal>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-pmd-plugin</artifactId>
