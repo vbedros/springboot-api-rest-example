@@ -18,6 +18,8 @@
   <properties>
     <springdoc.version>1.6.11</springdoc.version>
     <java.version>17</java.version>
+    <codestyle.checks.file></codestyle.checks.file>
+    <codestyle.suppressions.file>codestyle/checkstyle-suppressions.xml</codestyle.suppressions.file>
   </properties>
 
   
@@ -257,7 +259,6 @@
       <properties>
         <maven.test.skip>true</maven.test.skip>
       </properties>
-      <dependencies></dependencies>
       <build>
         <plugins>
           <plugin>
@@ -277,14 +278,6 @@
       <properties>
         <maven.test.skip>false</maven.test.skip>
       </properties>
-      <dependencies>
-<!--        <dependency>-->
-<!--          <groupId>com.github.spotbugs</groupId>-->
-<!--          <artifactId>spotbugs</artifactId>-->
-<!--          <version>4.7.3</version>-->
-<!--          <type>pom</type>-->
-<!--        </dependency>-->
-      </dependencies>
       <reporting>
         <plugins>
           <plugin>
@@ -342,10 +335,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>
-            <configuration>
-<!--              <suppressionsLocation>codestyle/checkstyle-checkstyle-suppressions.xml</suppressionsLocation>-->
-<!--              <suppressionsFileExpression>checkstyle.supressions.file</suppressionsFileExpression>-->
-            </configuration>
             <version>3.2.0</version>
             <reportSets>
               <reportSet>
@@ -447,9 +436,8 @@
             <configuration>
               <consoleOutput>false</consoleOutput>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
-              <configLocation>/codestyle/checkstyle_checks.xml</configLocation>
-              <suppressionsLocation>/codestyle/checkstyle-suppressions.xml</suppressionsLocation>
-<!--              <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>-->
+              <configLocation>${codestyle.checks.file}</configLocation>
+              <suppressionsLocation>${codestyle.suppressions.file}</suppressionsLocation>
               <failOnViolation>false</failOnViolation>
             </configuration>
             <dependencies>
