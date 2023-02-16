@@ -342,6 +342,10 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+<!--              <suppressionsLocation>codestyle/checkstyle-checkstyle-suppressions.xml</suppressionsLocation>-->
+<!--              <suppressionsFileExpression>checkstyle.supressions.file</suppressionsFileExpression>-->
+            </configuration>
             <version>3.2.0</version>
             <reportSets>
               <reportSet>
@@ -443,6 +447,9 @@
             <configuration>
               <consoleOutput>false</consoleOutput>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <configLocation>/codestyle/checkstyle_checks.xml</configLocation>
+              <suppressionsLocation>/codestyle/checkstyle-suppressions.xml</suppressionsLocation>
+<!--              <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>-->
               <failOnViolation>false</failOnViolation>
             </configuration>
             <dependencies>
