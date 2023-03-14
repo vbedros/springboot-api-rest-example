@@ -19,7 +19,7 @@
     <springdoc.version>1.6.11</springdoc.version>
     <java.version>17</java.version>
     <codestyle.checks.file></codestyle.checks.file>
-    <codestyle.suppressions.file>codestyle/checkstyle-suppressions.xml</codestyle.suppressions.file>
+    <codestyle.suppressions.file></codestyle.suppressions.file>
   </properties>
 
   
@@ -259,45 +259,15 @@
       <properties>
         <maven.test.skip>true</maven.test.skip>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>3.2.0</version>
-            <configuration>
-              <skip>true</skip>
-              <skipExec>true</skipExec>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
+      <build></build>
     </profile>
     <profile>
       <id>tests</id>
       <properties>
         <maven.test.skip>false</maven.test.skip>
       </properties>
-      <reporting>
-        <plugins>
-          <plugin>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-maven-plugin</artifactId>
-            <version>4.7.3.0</version>
-          </plugin>
-        </plugins>
-      </reporting>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>3.2.0</version>
-            <configuration>
-              <skip>true</skip>
-              <skipExec>true</skipExec>
-            </configuration>
-          </plugin>
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>

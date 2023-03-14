@@ -39,8 +39,8 @@
 
   <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
   <module name="SuppressionFilter">
-    <property name="file" default="/codestyle/checkstyle-suppressions.xml"
-              value="/codestyle/checkstyle-suppressions.xml"/>
+    <property name="file" default="/codestyle/checkstyle_suppressions.xml"
+              value="/codestyle/checkstyle_suppressions.xml"/>
     <property name="optional" value="true"/>
   </module>
 
