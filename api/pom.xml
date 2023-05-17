@@ -255,13 +255,6 @@
   </build>
   <profiles>
     <profile>
-      <id>default</id>
-      <properties>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
-      <build></build>
-    </profile>
-    <profile>
       <id>tests</id>
       <properties>
         <maven.test.skip>false</maven.test.skip>

@@ -8,7 +8,7 @@ We used ansible playbook from [project](https://github.com/Alliedium/awesome-jen
    1. In the first stage the project will be cloned from the GitHub repository.
 
    2. In the _Build_ stage maven dependencies are downloaded and jar file is build. Here we used the _default_ maven profile from our pom.xml file:
-        `mvn compile -P default`
+        `mvn compile`
    3. The static code analysis is performed during the _Static code analysis_ stage by activating _static-code-analysis_ maven profile:
         `mvn -X compile -P static-code-analysis`
    4. In the stage _Test_ the unit tests are running and the test coverage report is provided via maven command:
