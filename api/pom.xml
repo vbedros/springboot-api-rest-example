@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.7.3</version>
-    <relativePath /> <!-- lookup parent from repository -->
+    <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.github.throyer.common.spring-boot</groupId>
   <artifactId>api</artifactId>
@@ -17,7 +18,11 @@
   <properties>
     <springdoc.version>1.6.11</springdoc.version>
     <java.version>17</java.version>
+    <codestyle.checks.file></codestyle.checks.file>
+    <codestyle.suppressions.file></codestyle.suppressions.file>
   </properties>
+
+  
 
   <dependencies>
     <!-- spring boot -->
@@ -248,4 +253,166 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>tests</id>
+      <properties>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.8</version>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>static-code-analysis</id>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.2.0</version>
+        </dependency>
+      </dependencies>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.0</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>spotbugs</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.2.0</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>checkstyle</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>3.20.0</version>
+            <configuration>
+              <targetJdk>17</targetJdk>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>cpd</report>
+                  <report>pmd</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+        </plugins>
+      </reporting>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.0</version>
+            <dependencies>
+              <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs</artifactId>
+                <version>4.7.3</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <spotbugsXmlOutput>true</spotbugsXmlOutput>
+              <failOnError>false</failOnError>
+              <spotbugsXmlOutputDirectory>target</spotbugsXmlOutputDirectory>
+              <skipEmptyReport>false</skipEmptyReport>
+              <includeTests>true</includeTests>
+              <effort>Max</effort>
+              <threshold>Low</threshold>
+            </configuration>
+            <executions>
+              <execution>
+                <id>spotbugs</id>
+                <goals>
+                  <goal>spotbugs</goal>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>3.20.0</version>
+            <configuration>
+              <failOnViolation>false</failOnViolation>
+              <targetJdk>17</targetJdk>
+            </configuration>
+            <executions>
+              <execution>
+                <id>pmd-break</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>check</goal>
+                  <goal>cpd</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <id>verify-style</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify-cpd</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>checkstyle</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <consoleOutput>false</consoleOutput>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <configLocation>${codestyle.checks.file}</configLocation>
+              <suppressionsLocation>${codestyle.suppressions.file}</suppressionsLocation>
+              <failOnViolation>false</failOnViolation>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>com.puppycrawl.tools</groupId>
+                <artifactId>checkstyle</artifactId>
+                <version>9.3</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
