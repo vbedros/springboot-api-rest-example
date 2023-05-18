@@ -1,0 +1,108 @@
+pipeline {
+  agent any
+  parameters {
+    choice(
+      choices: ['sun_checks', 'sun_checks_with_suppressions', 'custom_checks', 'custom_checks_with_suppressions'],
+      description: 'Select xml file with checkstyle rules',
+      name: 'CHECKSTYLE_RULES_SET')
+    choice(
+      choices: ['maven3.8.4', 'maven3.9.0'],
+      description: 'Select maven version',
+      name: 'MAVEN_VERSION')
+  }
+
+
+  stages {
+    stage('Build') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
+      steps {
+        echo 'Download dependencies'
+        withMaven(maven: getMavenVersion(params.MAVEN_VERSION), publisherStrategy: 'EXPLICIT') {
+          sh "cd api \n\
+              mvn -B -ntp compile"
+        }
+      }
+    }
+    stage('Static code analysis') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
+      steps {
+        script {
+          echo 'Static code analysis'
+          currentCheckstyleRulesStr = getCheckstyleRules(params.CHECKSTYLE_RULES_SET)
+          withMaven(maven: getMavenVersion(params.MAVEN_VERSION), publisherStrategy: 'EXPLICIT') {
+          sh "echo ${currentCheckstyleRulesStr} \n\
+              cd api\n\
+              mvn -B -ntp clean package -P static-code-analysis ${currentCheckstyleRulesStr}\n\
+              echo \"static code analysis finished\""
+              }
+        }
+
+        echo "Reading static analysis report"
+        recordIssues enabledForFailure: true, failOnError: false, tool: checkStyle(pattern: "**/target/checkstyle-result.xml")
+        recordIssues enabledForFailure: true, failOnError: false, tool: spotBugs(pattern: "**/target/spotbugs*.xml")
+        recordIssues enabledForFailure: true, failOnError: false, tool: cpd(pattern: "**/target/cpd.xml")
+        recordIssues enabledForFailure: true, failOnError: false, tool: pmdParser(pattern: "**/target/pmd.xml")
+      }
+    }
+
+    stage('Test') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
+      steps {
+        script {
+          echo 'Test'
+          withMaven(maven: getMavenVersion(params.MAVEN_VERSION), publisherStrategy: 'EXPLICIT') {
+            sh "cd api\n\
+                mvn -B -ntp clean test -P tests \n\
+                mvn jacoco:report"
+          }
+        }
+
+        publishHTML([allowMissing: true, keepAll: true, alwaysLinkToLastBuild: true, reportDir: 'api/target/site/jacoco', reportFiles: 'index.html', reportName: 'Jacoco coverage HTML report'])
+      }
+    }
+  }
+}
+
+def getMavenVersion(String selectedMavenVersion) {
+  String mvnVersion = ''
+  switch (selectedMavenVersion) {
+    case "maven3.8.4":
+      mvnVersion = 'maven3.8.4'
+      break
+    case "maven3.9.0":
+      mvnVersion = 'maven3.9.0'
+      break
+    default:
+      mvnVersion = 'maven3.8.4'
+      break
+  }
+  return mvnVersion
+}
+
+def getCheckstyleRules(String selectedCheckstyleRules) {
+  String mvnOptions = ''
+  switch (selectedCheckstyleRules) {
+    case "sun_checks":
+      mvnOptions = '-Dcodestyle.checks.file=./codestyle/sun_checks.xml'
+      break
+    case "sun_checks_with_suppressions":
+      mvnOptions = '-Dcodestyle.checks.file=./codestyle/sun_checks.xml -Dcodestyle.suppressions.file=./codestyle/checkstyle_suppressions.xml'
+      break
+    case "custom_checks":
+      mvnOptions = '-Dcodestyle.checks.file=./codestyle/checkstyle_checks.xml'
+      break
+    case "custom_checks_with_suppressions":
+      mvnOptions = '-Dcodestyle.checks.file=./codestyle/checkstyle_checks.xml -Dcodestyle.suppressions.file=./codestyle/checkstyle_suppressions.xml'
+      break
+    default:
+      mvnOptions = '-Dcodestyle.checks.file=./codestyle/sun_checks.xml'
+      break
+  }
+  return mvnOptions
+}
